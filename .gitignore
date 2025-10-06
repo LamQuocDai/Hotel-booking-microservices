@@ -30,3 +30,5 @@ logs/
 
 # Docker
 *.pid
+
+.cursor/rules/my-custom-rule.mdc
