@@ -32,3 +32,62 @@ logs/
 *.pid
 
 .cursor/rules/my-custom-rule.mdc
+
+# ==========================
+# Secrets & Environment
+# ==========================
+# Generic env files
+.env*
+!env.example
+
+# Service-specific env files
+frontend/.env*
+api-gateway/.env*
+account-service/.env*
+booking-service/.env*
+payment-service/.env*
+
+# Secret config files per service
+# Spring Boot
+account-service/src/main/resources/application-*.yml
+account-service/src/main/resources/application-*.yaml
+
+# .NET appsettings (keep non-secret example committed only)
+booking-service/appsettings.Development.json
+booking-service/appsettings.Local.json
+
+# NestJS/Gateway extra envs
+api-gateway/.env.*
+
+# ==========================
+# Keys & Certificates
+# ==========================
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+*.der
+*.jks
+*.keystore
+*.csr
+
+# Common private keys
+**/id_rsa*
+**/id_ecdsa*
+**/private.key
+**/public.key
+**/*_key
+
+# ==========================
+# Dumps / Backups
+# ==========================
+*.sql
+*.dump
+*.bak
+dump/
+backups/
+
+# Docker override with local-only secrets
+docker-compose.override.yml
