@@ -1,0 +1,192 @@
+version: "3.8"
+
+services:
+  # Frontend
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - api-gateway
+    networks:
+      - hotel_net
+
+  # API Gateway
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - FRONTEND_URL=http://localhost:3000
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+      - ACCOUNT_SERVICE_URL=account-service:50051
+      - BOOKING_SERVICE_URL=booking-service:50052
+      - PAYMENT_SERVICE_URL=payment-service:50053
+    depends_on:
+      - consul
+      - account-service
+      - booking-service
+      - payment-service
+    networks:
+      - hotel_net
+
+  # Account Service
+  account-service:
+    build: ./account-service
+    ports:
+      - "3002:3002"
+      - "50051:50051"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/account_db?useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+      - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - hotel_net
+
+  # Booking Service
+  booking-service:
+    build: ./booking-service
+    ports:
+      - "3003:3003"
+      - "50052:50052"
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=booking_db;Username=postgres;Password=password
+      - ConnectionStrings__Redis=redis:6379
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - hotel_net
+
+  # Payment Service
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "3004:3004"
+      - "50053:50053"
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017
+      - DATABASE_NAME=payment_db
+      - PORT=3004
+    depends_on:
+      - mongodb
+    networks:
+      - hotel_net
+
+  # Consul
+  consul:
+    image: consul:1.16
+    ports:
+      - "8500:8500"
+      - "8502:8502"
+    volumes:
+      - ./consul/config.hcl:/consul/config/config.hcl
+      - consul_data:/consul/data
+    command: consul agent -config-file=/consul/config/config.hcl
+    networks:
+      - hotel_net
+
+  # MySQL
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=account_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hotel_net
+
+  # PostgreSQL
+  postgres:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=booking_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hotel_net
+
+  # MongoDB
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=payment_db
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - hotel_net
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - hotel_net
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=200h"
+      - "--web.enable-lifecycle"
+    networks:
+      - hotel_net
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3005:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+    depends_on:
+      - prometheus
+    networks:
+      - hotel_net
+
+volumes:
+  mysql_data:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+  consul_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  hotel_net:
+    driver: bridge

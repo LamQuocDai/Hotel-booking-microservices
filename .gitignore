@@ -1,0 +1,32 @@
+# Node (Next.js, Gateway)
+node_modules/
+.next/
+dist/
+.env
+.env.local
+
+# Golang
+/payment-service/bin/
+payment-service/tmp/
+*.exe
+*.out
+
+# .NET
+booking-service/bin/
+booking-service/obj/
+
+# Java
+account-service/target/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs & temp
+logs/
+*.log
+*.tmp
+.DS_Store
+
+# Docker
+*.pid
