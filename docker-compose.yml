@@ -102,7 +102,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=123456
       - MYSQL_DATABASE=account_db
     volumes:
       - mysql_data:/var/lib/mysql
@@ -117,7 +117,7 @@ services:
     environment:
       - POSTGRES_DB=booking_db
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=123456  
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:

@@ -19,6 +19,7 @@ booking-service/obj/
 
 # Java
 account-service/target/
+account-service/src/main/resources/application.yml
 
 # IDE
 .vscode/
