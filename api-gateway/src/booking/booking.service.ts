@@ -1,43 +1,44 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import type { ClientGrpc } from '@nestjs/microservices';
+import { Observable, firstValueFrom } from 'rxjs';
 import { CreateBookingDto } from './dto/create-booking.dto';
 
-interface BookingService {
-  getRooms(): Promise<any>;
-  getRoom(data: { id: string }): Promise<any>;
-  createBooking(data: any): Promise<any>;
-  getMyBookings(data: { userId: string }): Promise<any>;
+interface IBookingService {
+  getRooms(): Observable<any>;
+  getRoom(data: { id: string }): Observable<any>;
+  createBooking(data: any): Observable<any>;
+  getMyBookings(data: { userId: string }): Observable<any>;
 }
 
 @Injectable()
 export class BookingService {
-  private bookingService: BookingService;
+  private bookingService: IBookingService;
 
   constructor(@Inject('BOOKING_SERVICE') private client: ClientGrpc) {}
 
   onModuleInit() {
     this.bookingService =
-      this.client.getService<BookingService>('BookingService');
+      this.client.getService<IBookingService>('BookingService');
   }
 
   async getRooms() {
-    return await this.bookingService.getRooms().toPromise();
+    return await firstValueFrom(this.bookingService.getRooms());
   }
 
   async getRoom(id: string) {
-    return await this.bookingService.getRoom({ id }).toPromise();
+    return await firstValueFrom(this.bookingService.getRoom({ id }));
   }
 
   async createBooking(createBookingDto: CreateBookingDto, userId: string) {
-    return await this.bookingService
-      .createBooking({
+    return await firstValueFrom(
+      this.bookingService.createBooking({
         ...createBookingDto,
         userId,
-      })
-      .toPromise();
+      }),
+    );
   }
 
   async getMyBookings(userId: string) {
-    return await this.bookingService.getMyBookings({ userId }).toPromise();
+    return await firstValueFrom(this.bookingService.getMyBookings({ userId }));
   }
 }

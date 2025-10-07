@@ -16,6 +16,8 @@ payment-service/go.mod
 # .NET
 booking-service/bin/
 booking-service/obj/
+booking-service/logs/
+booking-service/.vs/
 
 # Java
 account-service/target/

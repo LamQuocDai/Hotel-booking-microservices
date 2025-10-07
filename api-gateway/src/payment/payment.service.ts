@@ -1,43 +1,44 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import type { ClientGrpc } from '@nestjs/microservices';
+import { Observable, firstValueFrom } from 'rxjs';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 
-interface PaymentService {
-  createPayment(data: any): Promise<any>;
-  getPromotions(): Promise<any>;
-  getMyPayments(data: { userId: string }): Promise<any>;
-  getPayment(data: { id: string }): Promise<any>;
+interface IPaymentService {
+  createPayment(data: any): Observable<any>;
+  getPromotions(): Observable<any>;
+  getMyPayments(data: { userId: string }): Observable<any>;
+  getPayment(data: { id: string }): Observable<any>;
 }
 
 @Injectable()
 export class PaymentService {
-  private paymentService: PaymentService;
+  private paymentService: IPaymentService;
 
   constructor(@Inject('PAYMENT_SERVICE') private client: ClientGrpc) {}
 
   onModuleInit() {
     this.paymentService =
-      this.client.getService<PaymentService>('PaymentService');
+      this.client.getService<IPaymentService>('PaymentService');
   }
 
   async createPayment(createPaymentDto: CreatePaymentDto, userId: string) {
-    return await this.paymentService
-      .createPayment({
+    return await firstValueFrom(
+      this.paymentService.createPayment({
         ...createPaymentDto,
         userId,
-      })
-      .toPromise();
+      }),
+    );
   }
 
   async getPromotions() {
-    return await this.paymentService.getPromotions().toPromise();
+    return await firstValueFrom(this.paymentService.getPromotions());
   }
 
   async getMyPayments(userId: string) {
-    return await this.paymentService.getMyPayments({ userId }).toPromise();
+    return await firstValueFrom(this.paymentService.getMyPayments({ userId }));
   }
 
   async getPayment(id: string) {
-    return await this.paymentService.getPayment({ id }).toPromise();
+    return await firstValueFrom(this.paymentService.getPayment({ id }));
   }
 }

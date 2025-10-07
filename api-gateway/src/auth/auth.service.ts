@@ -1,29 +1,30 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import type { ClientGrpc } from '@nestjs/microservices';
 import { Inject } from '@nestjs/common';
+import { Observable, firstValueFrom } from 'rxjs';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
-interface AccountService {
-  login(data: LoginDto): Promise<any>;
-  register(data: RegisterDto): Promise<any>;
-  refreshToken(data: { refreshToken: string }): Promise<any>;
+interface IAccountService {
+  login(data: LoginDto): Observable<any>;
+  register(data: RegisterDto): Observable<any>;
+  refreshToken(data: { refreshToken: string }): Observable<any>;
 }
 
 @Injectable()
 export class AuthService {
-  private accountService: AccountService;
+  private accountService: IAccountService;
 
   constructor(@Inject('ACCOUNT_SERVICE') private client: ClientGrpc) {}
 
   onModuleInit() {
     this.accountService =
-      this.client.getService<AccountService>('AccountService');
+      this.client.getService<IAccountService>('AccountService');
   }
 
   async login(loginDto: LoginDto) {
     try {
-      return await this.accountService.login(loginDto).toPromise();
+      return await firstValueFrom(this.accountService.login(loginDto));
     } catch (error) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -31,7 +32,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     try {
-      return await this.accountService.register(registerDto).toPromise();
+      return await firstValueFrom(this.accountService.register(registerDto));
     } catch (error) {
       throw new UnauthorizedException('Registration failed');
     }
@@ -39,9 +40,9 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
-      return await this.accountService
-        .refreshToken({ refreshToken })
-        .toPromise();
+      return await firstValueFrom(
+        this.accountService.refreshToken({ refreshToken }),
+      );
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
