@@ -54,6 +54,7 @@ account-service/src/main/resources/application-*.yaml
 
 # .NET appsettings (keep non-secret example committed only)
 booking-service/appsettings.Development.json
+booking-service/appsettings.json
 booking-service/appsettings.Local.json
 
 # NestJS/Gateway extra envs
