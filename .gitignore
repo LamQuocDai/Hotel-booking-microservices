@@ -10,6 +10,8 @@ dist/
 payment-service/tmp/
 *.exe
 *.out
+payment-service/go.sum
+payment-service/go.mod
 
 # .NET
 booking-service/bin/
