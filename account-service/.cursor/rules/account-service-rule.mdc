@@ -1,0 +1,385 @@
+# Account Service - Hotel Booking Microservices
+
+## 📦 Tổng quan
+
+Account-service là **Identity Provider (IDP)** của hệ thống Hotel Booking Microservices, chịu trách nhiệm:
+
+- Quản lý người dùng, vai trò, quyền hạn
+- Xác thực và phân quyền JWT
+- Cung cấp gRPC API cho các service khác
+- Cung cấp REST API cho Frontend
+
+## 🏗️ Kiến trúc
+
+### Công nghệ
+
+- **Java 17+**
+- **Spring Boot 3.2.0**
+- **Spring Security + JWT (RSA)**
+- **Spring Data JPA + Hibernate**
+- **MySQL 8.0**
+- **Redis** (refresh token)
+- **gRPC** (service communication)
+- **Maven** (build tool)
+
+### Cấu trúc thư mục
+
+```
+src/main/java/com/hotelbooking/account/
+├── controller/          # REST Controllers
+├── service/            # Business Logic
+├── repository/         # Data Access Layer
+├── entity/             # JPA Entities
+├── dto/                # Data Transfer Objects
+├── config/             # Configuration Classes
+├── security/           # Security Configuration
+├── grpc/               # gRPC Services
+└── exception/          # Exception Handlers
+```
+
+## 🗄️ Database Schema
+
+### Account Entity
+
+```java
+@Entity
+@Table(name = "accounts")
+public class Account {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    private String phone;
+
+    @Column(nullable = false)
+    private String password; // BCrypt encoded
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles;
+
+    private OffsetDateTime createdAt;
+    private OffsetDateTime deletedAt;
+}
+```
+
+### Role Entity
+
+```java
+@Entity
+@Table(name = "roles")
+public class Role {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String name;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Permission> permissions;
+
+    private OffsetDateTime createdAt;
+    private OffsetDateTime deletedAt;
+}
+```
+
+### Permission Entity
+
+```java
+@Entity
+@Table(name = "permissions")
+public class Permission {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String permission;
+
+    private OffsetDateTime createdAt;
+    private OffsetDateTime deletedAt;
+}
+```
+
+## 🔐 Security & Authentication
+
+### JWT Configuration
+
+- **Algorithm**: RS256 (RSA)
+- **Private Key**: Ký JWT (Account Service)
+- **Public Key**: Xác minh JWT (API Gateway & Services)
+- **Access Token**: 1 giờ
+- **Refresh Token**: 7 ngày (lưu trong Redis)
+
+### Password Security
+
+- **Encoder**: BCrypt
+- **Strength**: 12 rounds
+
+### API Security
+
+- **CORS**: Enabled for all origins
+- **CSRF**: Disabled (JWT-based)
+- **Authentication**: JWT Bearer Token
+
+## 🌐 API Endpoints
+
+### REST API (Port 3002)
+
+#### Authentication
+
+- `POST /auth/login` - Đăng nhập
+- `POST /auth/register` - Đăng ký
+- `POST /auth/refresh` - Làm mới token
+- `GET /auth/health` - Health check
+
+#### Response Format
+
+```json
+{
+  "token": "jwt_access_token",
+  "refreshToken": "refresh_token",
+  "user": {
+    "id": "uuid",
+    "username": "string",
+    "email": "string",
+    "phone": "string",
+    "role": "string",
+    "createdAt": "ISO8601"
+  }
+}
+```
+
+### gRPC API (Port 50051)
+
+#### Service: AccountService
+
+- `rpc Login(LoginRequest) returns (LoginResponse)`
+- `rpc Register(RegisterRequest) returns (RegisterResponse)`
+- `rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse)`
+- `rpc GetProfile(GetProfileRequest) returns (GetProfileResponse)`
+
+## ⚙️ Configuration
+
+### application.yml
+
+```yaml
+server:
+  port: 3002
+
+spring:
+  datasource:
+    url: jdbc:mysql://mysql:3306/account_db?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  data:
+    redis:
+      host: redis
+      port: 6379
+
+jwt:
+  private-key: |
+    -----BEGIN PRIVATE KEY-----
+    [RSA_PRIVATE_KEY]
+    -----END PRIVATE KEY-----
+  public-key: |
+    -----BEGIN PUBLIC KEY-----
+    [RSA_PUBLIC_KEY]
+    -----END PUBLIC KEY-----
+  expiration: 3600000
+
+grpc:
+  server:
+    port: 50051
+```
+
+### Environment Variables
+
+```bash
+SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/account_db
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=123456
+SPRING_DATA_REDIS_HOST=redis
+SPRING_DATA_REDIS_PORT=6379
+JWT_PRIVATE_KEY=[RSA_PRIVATE_KEY]
+JWT_PUBLIC_KEY=[RSA_PUBLIC_KEY]
+```
+
+## 🐳 Docker
+
+### Dockerfile
+
+```dockerfile
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN apt-get update && apt-get install -y maven
+RUN mvn clean package -DskipTests
+EXPOSE 3002 50051
+CMD ["java", "-jar", "target/account-service-0.0.1-SNAPSHOT.jar"]
+```
+
+### Docker Compose
+
+```yaml
+account-service:
+  build: ./account-service
+  ports:
+    - "3002:3002"
+    - "50051:50051"
+  environment:
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/account_db
+    - SPRING_DATASOURCE_USERNAME=root
+    - SPRING_DATASOURCE_PASSWORD=123456
+    - SPRING_DATA_REDIS_HOST=redis
+    - JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+    - JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+  depends_on:
+    - mysql
+    - redis
+```
+
+## 🧪 Testing
+
+### Health Check
+
+```bash
+curl http://localhost:3002/auth/health
+```
+
+### Login Test
+
+```bash
+curl -X POST http://localhost:3002/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+```
+
+### Register Test
+
+```bash
+curl -X POST http://localhost:3002/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","email":"test@example.com","password":"password123","phone":"0123456789"}'
+```
+
+## 🔄 Service Communication
+
+### With API Gateway
+
+- **Protocol**: gRPC
+- **Port**: 50051
+- **Service**: AccountService
+- **Authentication**: JWT validation
+
+### With Other Services
+
+- **Account Service** → **Booking Service**: User validation
+- **Account Service** → **Payment Service**: User validation
+- **API Gateway** → **Account Service**: Authentication & authorization
+
+## 📊 Monitoring
+
+### Health Endpoints
+
+- `GET /actuator/health` - Spring Boot Actuator
+- `GET /auth/health` - Custom health check
+
+### Metrics
+
+- `GET /actuator/prometheus` - Prometheus metrics
+- `GET /actuator/metrics` - Application metrics
+
+## 🚀 Development
+
+### Local Development
+
+```bash
+# Start dependencies
+docker-compose up mysql redis -d
+
+# Run application
+mvn spring-boot:run
+
+# Or with Maven wrapper
+./mvnw spring-boot:run
+```
+
+### Build
+
+```bash
+mvn clean package -DskipTests
+```
+
+### Database Migration
+
+- Hibernate auto-ddl: `update`
+- Manual migration: SQL scripts in `src/main/resources/`
+
+## 🛠️ Code Standards
+
+### Naming Conventions
+
+- **Classes**: PascalCase (e.g., `AccountService`)
+- **Methods**: camelCase (e.g., `findByEmail`)
+- **Variables**: camelCase (e.g., `userRepository`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `JWT_EXPIRATION`)
+
+### Package Structure
+
+- **Controller**: Handle HTTP requests
+- **Service**: Business logic
+- **Repository**: Data access
+- **Entity**: JPA entities
+- **DTO**: Data transfer objects
+- **Config**: Configuration classes
+
+### Error Handling
+
+- **Global Exception Handler**: `@ControllerAdvice`
+- **Custom Exceptions**: Business logic errors
+- **Validation**: `@Valid` annotations
+- **Response Format**: Consistent JSON structure
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+1. **JWT Key Mismatch**: Ensure private/public keys match
+2. **Database Connection**: Check MySQL credentials and network
+3. **Redis Connection**: Verify Redis is running
+4. **Port Conflicts**: Ensure ports 3002, 50051 are available
+
+### Logs
+
+```bash
+# View application logs
+docker-compose logs account-service
+
+# View specific log level
+docker-compose logs account-service | grep ERROR
+```
+
+## 📝 Notes
+
+- **UUID**: All entity IDs use UUID for better distributed system support
+- **Soft Delete**: Entities use `deletedAt` for soft deletion
+- **UTC Time**: All timestamps stored in UTC
+- **Validation**: Input validation using Bean Validation
+- **Security**: JWT tokens are stateless and secure
+- **Scalability**: Service can be horizontally scaled
