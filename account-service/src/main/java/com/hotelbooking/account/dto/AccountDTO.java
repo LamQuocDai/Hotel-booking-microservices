@@ -24,7 +24,7 @@ public class AccountDTO {
         this.username = account.getUsername();
         this.email = account.getEmail();
         this.phone = account.getPhone();
-        this.role = account.getRole().getName();
+        this.role = account.getRole().getRoleName(); // Fix: use getRoleName() from enum
         this.imageUrl = account.getImageUrl();
         this.createdAt = account.getCreatedAt();
     }

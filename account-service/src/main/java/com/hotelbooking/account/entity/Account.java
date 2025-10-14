@@ -1,5 +1,6 @@
 package com.hotelbooking.account.entity;
 
+import com.hotelbooking.account.enums.RoleType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,6 @@ import java.util.UUID;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
     private UUID id;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -30,22 +30,20 @@ public class Account {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "image_url")
+    @Column(length = 200)
     private String imageUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id")
-    private Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RoleType role; // Sử dụng trực tiếp enum thay vì entity Role
 
-    @Column(nullable = false, name = "created_at")
+    @Column(nullable = false)
     private OffsetDateTime createdAt;
 
-    @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
 
     @PrePersist
-    public void onCreate()
-    {
+    public void onCreate() {
         this.createdAt = OffsetDateTime.now();
     }
 }

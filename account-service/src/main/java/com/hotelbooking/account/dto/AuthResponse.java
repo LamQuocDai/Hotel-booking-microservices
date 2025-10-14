@@ -1,17 +1,16 @@
 package com.hotelbooking.account.dto;
 
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthResponse {
     private String token;
     private String refreshToken;
     private AccountDTO user;
-
-    public AuthResponse() {}
-
-    public AuthResponse(String token, String refreshToken, AccountDTO user) {
-        this.token = token;
-        this.refreshToken = refreshToken;
-        this.user = user;
-    }
 }
