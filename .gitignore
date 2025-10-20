@@ -12,6 +12,7 @@ payment-service/tmp/
 *.out
 payment-service/go.sum
 payment-service/go.mod
+payment-service/.env
 
 # .NET
 booking-service/bin/
