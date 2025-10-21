@@ -1,43 +1,60 @@
+// Package main Payment Service API
+// @title Payment Service API
+// @version 1.0
+// @description This is a payment service API with promotion management
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8081
+// @BasePath /api/v1
+// @schemes http https
+
 package main
 
 import (
-    "os"
-    "github.com/joho/godotenv"
-    "log"
-    "context"
-    "time"
-    "go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-)
-
-
-import (
 	"fmt"
-	"net/http"
+	"log"
+	"payment-service/internal/config"
+	"payment-service/pkg/container"
+	"payment-service/pkg/database"
+	"payment-service/pkg/router"
+
+	_ "payment-service/docs"
 )
 
 func main() {
-    if err := godotenv.Load(); err != nil {
-        log.Println("Error loading .env file")
-    }
-    client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("URL_DB")))
-    if err != nil {
-        log.Println("Error connecting to MongoDB", err)
-        return
-    }
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	err = client.Connect(ctx)
+	// Load configuration
+	cfg := config.LoadConfig()
+
+	// Initialize database
+	db, err := database.NewMongoDB()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Failed to connect to database: ", err)
 	}
-	defer client.Disconnect(ctx)
-	log.Println("Successfully connected to MongoDB!")
+	defer db.Close()
 
+	// Initialize container with dependency injection
+	container := container.NewContainer(db)
 
-	fmt.Println("🚀 Payment Service running on port 8081")
-    http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-        w.Write([]byte("Payment service OK"))
-    })
-    http.ListenAndServe(":8081", nil)
+	// Setup router
+	r := router.NewRouter()
+	handlers := &router.Handlers{
+		PromotionHandler:   container.PromotionHandler,
+		PaymentHandler:     container.PaymentHandler,
+		TransactionHandler: container.TransactionHandler,
+	}
+	r.SetupRoutes(handlers)
+
+	// Start server
+	fmt.Printf("🚀 Payment Service running on port %s\n", cfg.Port)
+	fmt.Printf("📚 Swagger documentation available at: http://localhost:%s/swagger/index.html\n", cfg.Port)
+	if err := r.Start(cfg.Port); err != nil {
+		log.Fatal("Failed to run server: ", err)
+	}
 }
