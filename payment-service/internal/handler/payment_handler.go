@@ -40,7 +40,7 @@ func NewPaymentHandler(paymentService *service.PaymentService) *PaymentHandler {
 // @Param currency query string false "Filter by currency"
 // @Success 200 {object} response.APIResponse{data=pagination.PaginatedResponse}
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/payments [get]
+// @Router /payments [get]
 func (h *PaymentHandler) GetPayments(c *gin.Context) {
 	// Parse pagination query
 	paginationQuery := pagination.ParsePaginationQuery(c)
@@ -72,7 +72,7 @@ func (h *PaymentHandler) GetPayments(c *gin.Context) {
 // @Failure 400 {object} response.APIResponse
 // @Failure 404 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/payments/{id} [get]
+// @Router /payments/{id} [get]
 func (h *PaymentHandler) GetPaymentByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -105,7 +105,7 @@ func (h *PaymentHandler) GetPaymentByID(c *gin.Context) {
 // @Success 200 {object} response.APIResponse{data=[]model.Payment}
 // @Failure 400 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/payments/customer/{customerId} [get]
+// @Router /payments/customer/{customerId} [get]
 func (h *PaymentHandler) GetPaymentsByCustomerID(c *gin.Context) {
 	customerIDStr := c.Param("customerId")
 	customerID, err := uuid.Parse(customerIDStr)
@@ -133,7 +133,7 @@ func (h *PaymentHandler) GetPaymentsByCustomerID(c *gin.Context) {
 // @Success 201 {object} response.APIResponse{data=model.Payment}
 // @Failure 400 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/payments [post]
+// @Router /payments [post]
 func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 	var req model.CreatePaymentRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -162,7 +162,7 @@ func (h *PaymentHandler) CreatePayment(c *gin.Context) {
 // @Failure 400 {object} response.APIResponse
 // @Failure 404 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/payments/{id} [put]
+// @Router /payments/{id} [patch]
 func (h *PaymentHandler) UpdatePayment(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -197,7 +197,7 @@ func (h *PaymentHandler) UpdatePayment(c *gin.Context) {
 // @Failure 400 {object} response.APIResponse
 // @Failure 404 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/payments/{id} [delete]
+// @Router /payments/{id} [delete]
 func (h *PaymentHandler) DeletePayment(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)

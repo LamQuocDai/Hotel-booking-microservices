@@ -38,7 +38,7 @@ func NewPromotionHandler(promotionService *service.PromotionService) *PromotionH
 // @Param maxDiscount query number false "Maximum discount percentage"
 // @Success 200 {object} response.APIResponse{data=pagination.PaginatedResponse}
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/promotions [get]
+// @Router /promotions [get]
 func (h *PromotionHandler) GetPromotions(c *gin.Context) {
 	// Parse pagination query
 	paginationQuery := pagination.ParsePaginationQuery(c)
@@ -70,7 +70,7 @@ func (h *PromotionHandler) GetPromotions(c *gin.Context) {
 // @Failure 400 {object} response.APIResponse
 // @Failure 404 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/promotions/{id} [get]
+// @Router /promotions/{id} [get]
 func (h *PromotionHandler) GetPromotionByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -103,7 +103,7 @@ func (h *PromotionHandler) GetPromotionByID(c *gin.Context) {
 // @Success 201 {object} response.APIResponse{data=model.Promotion}
 // @Failure 400 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/promotions [post]
+// @Router /promotions [post]
 func (h *PromotionHandler) CreatePromotion(c *gin.Context) {
 	var req model.CreatePromotionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -132,7 +132,7 @@ func (h *PromotionHandler) CreatePromotion(c *gin.Context) {
 // @Failure 400 {object} response.APIResponse
 // @Failure 404 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/promotions/{id} [put]
+// @Router /promotions/{id} [patch]
 func (h *PromotionHandler) UpdatePromotion(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)
@@ -167,7 +167,7 @@ func (h *PromotionHandler) UpdatePromotion(c *gin.Context) {
 // @Failure 400 {object} response.APIResponse
 // @Failure 404 {object} response.APIResponse
 // @Failure 500 {object} response.APIResponse
-// @Router /api/v1/promotions/{id} [delete]
+// @Router /promotions/{id} [delete]
 func (h *PromotionHandler) DeletePromotion(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := uuid.Parse(idStr)

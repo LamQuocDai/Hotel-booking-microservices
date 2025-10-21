@@ -42,7 +42,7 @@ func (r *Router) SetupRoutes(handlers *Handlers) {
 			promotions.GET("", handlers.PromotionHandler.GetPromotions)
 			promotions.GET("/:id", handlers.PromotionHandler.GetPromotionByID)
 			promotions.POST("", handlers.PromotionHandler.CreatePromotion)
-			promotions.PUT("/:id", handlers.PromotionHandler.UpdatePromotion)
+			promotions.PATCH("/:id", handlers.PromotionHandler.UpdatePromotion)
 			promotions.DELETE("/:id", handlers.PromotionHandler.DeletePromotion)
 		}
 
@@ -53,7 +53,7 @@ func (r *Router) SetupRoutes(handlers *Handlers) {
 			payments.GET("/:id", handlers.PaymentHandler.GetPaymentByID)
 			payments.GET("/customer/:customerId", handlers.PaymentHandler.GetPaymentsByCustomerID)
 			payments.POST("", handlers.PaymentHandler.CreatePayment)
-			payments.PUT("/:id", handlers.PaymentHandler.UpdatePayment)
+			payments.PATCH("/:id", handlers.PaymentHandler.UpdatePayment)
 			payments.DELETE("/:id", handlers.PaymentHandler.DeletePayment)
 		}
 
@@ -64,7 +64,7 @@ func (r *Router) SetupRoutes(handlers *Handlers) {
 			transactions.GET("/:id", handlers.TransactionHandler.GetTransactionByID)
 			transactions.GET("/payment/:paymentId", handlers.TransactionHandler.GetTransactionsByPaymentID)
 			transactions.POST("", handlers.TransactionHandler.CreateTransaction)
-			transactions.PUT("/:id", handlers.TransactionHandler.UpdateTransaction)
+			transactions.PATCH("/:id", handlers.TransactionHandler.UpdateTransaction)
 			transactions.DELETE("/:id", handlers.TransactionHandler.DeleteTransaction)
 		}
 	}
