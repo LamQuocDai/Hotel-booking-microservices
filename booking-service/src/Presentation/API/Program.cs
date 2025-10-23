@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 // using BookingService.Data;
 // using BookingService.Services;
 using Serilog;
+using Infrashtructure;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,8 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add services to the container.
 builder.Services.AddControllers();

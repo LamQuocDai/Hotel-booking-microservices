@@ -16,10 +16,18 @@ payment-service/.env
 payment-service/docs/
 
 # .NET
-booking-service/bin/
-booking-service/obj/
-booking-service/logs/
+booking-service/src/Application/Application/bin/
+booking-service/src/Application/Application/obj/
+booking-service/src/Application/Application/logs/
 booking-service/.vs/
+booking-service/src/Domain/Domain/bin/
+booking-service/src/Domain/Domain/obj/
+booking-service/src/Infrastructure/Infrastructure/bin/
+booking-service/src/Infrastructure/Infrastructure/obj/
+booking-service/src/Presentation/API/bin/
+booking-service/src/Presentation/API/obj/
+booking-service/src/Presentation/API/appsettings.Development.json
+booking-service/src/Presentation/API/appsettings.json
 
 # Java
 account-service/target/
