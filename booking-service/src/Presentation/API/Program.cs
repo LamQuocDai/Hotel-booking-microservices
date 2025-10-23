@@ -1,3 +1,4 @@
+using Application;
 using Microsoft.EntityFrameworkCore;
 // using BookingService.Data;
 // using BookingService.Services;
@@ -15,7 +16,9 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+// Add Infrastructure and Application services
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 // Add services to the container.
 builder.Services.AddControllers();

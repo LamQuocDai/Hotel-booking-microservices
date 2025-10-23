@@ -1,4 +1,6 @@
-﻿using Infrashtructure.Data;
+﻿using Application.Interfaces;
+using Infrashtructure.Data;
+using Infrashtructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,8 @@ public static class DependencyInjection
             }
             options.UseNpgsql(connectionString);
         });
+
+        services.AddScoped<ILocationService, LocationService>();
 
         return services;
     }
