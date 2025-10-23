@@ -1,0 +1,1121 @@
+basePath: /api/v1
+definitions:
+  model.CreatePaymentRequest:
+    properties:
+      currency:
+        example: USD
+        type: string
+      customerId:
+        type: string
+      description:
+        example: Hotel booking payment
+        type: string
+      paymentMethod:
+        example: credit_card
+        type: string
+      promotionId:
+        type: string
+      roomBookingIds:
+        items:
+          type: string
+        type: array
+      tax:
+        example: 10
+        minimum: 0
+        type: number
+      total:
+        example: 100
+        minimum: 0
+        type: number
+    required:
+    - currency
+    - customerId
+    - paymentMethod
+    - total
+    type: object
+  model.CreatePromotionRequest:
+    properties:
+      code:
+        example: SAVE20
+        type: string
+      description:
+        example: Save 20% on your booking
+        type: string
+      discount:
+        example: 20.5
+        maximum: 100
+        minimum: 0
+        type: number
+      endDate:
+        type: string
+      isActive:
+        example: true
+        type: boolean
+      startDate:
+        type: string
+    required:
+    - code
+    - discount
+    - endDate
+    - startDate
+    type: object
+  model.CreateTransactionRequest:
+    properties:
+      amount:
+        example: 100
+        minimum: 0
+        type: number
+      currency:
+        example: USD
+        type: string
+      externalId:
+        example: stripe_pi_1234
+        type: string
+      paymentGateway:
+        example: stripe
+        type: string
+      paymentId:
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/model.TransactionType'
+        enum:
+        - payment
+        - refund
+        - partial_refund
+        example: payment
+    required:
+    - amount
+    - currency
+    - paymentGateway
+    - paymentId
+    - type
+    type: object
+  model.Payment:
+    properties:
+      createdAt:
+        type: string
+      currency:
+        example: USD
+        type: string
+      customerId:
+        type: string
+      description:
+        example: Hotel booking payment
+        type: string
+      discount:
+        example: 20
+        minimum: 0
+        type: number
+      id:
+        type: string
+      paymentMethod:
+        example: credit_card
+        type: string
+      promotionId:
+        type: string
+      roomBookingIds:
+        items:
+          type: string
+        type: array
+      status:
+        allOf:
+        - $ref: '#/definitions/model.PaymentStatus'
+        enum:
+        - pending
+        - paid
+        - failed
+        - cancelled
+        - refunded
+        example: pending
+      tax:
+        example: 10
+        minimum: 0
+        type: number
+      total:
+        example: 100
+        minimum: 0
+        type: number
+      totalPrice:
+        example: 90
+        minimum: 0
+        type: number
+      updatedAt:
+        type: string
+    required:
+    - currency
+    - customerId
+    - status
+    - total
+    - totalPrice
+    type: object
+  model.PaymentStatus:
+    enum:
+    - pending
+    - paid
+    - failed
+    - cancelled
+    - refunded
+    type: string
+    x-enum-varnames:
+    - PaymentStatusPending
+    - PaymentStatusPaid
+    - PaymentStatusFailed
+    - PaymentStatusCancelled
+    - PaymentStatusRefunded
+  model.Promotion:
+    properties:
+      code:
+        example: SAVE20
+        type: string
+      createdAt:
+        type: string
+      description:
+        example: Save 20% on your booking
+        type: string
+      discount:
+        example: 20.5
+        maximum: 100
+        minimum: 0
+        type: number
+      endDate:
+        type: string
+      id:
+        type: string
+      isActive:
+        example: true
+        type: boolean
+      startDate:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - code
+    - discount
+    - endDate
+    - startDate
+    type: object
+  model.Transaction:
+    properties:
+      amount:
+        example: 100
+        minimum: 0
+        type: number
+      createdAt:
+        type: string
+      currency:
+        example: USD
+        type: string
+      externalId:
+        example: stripe_pi_1234
+        type: string
+      failureReason:
+        type: string
+      gatewayResponse:
+        additionalProperties: true
+        type: object
+      id:
+        type: string
+      paymentGateway:
+        example: stripe
+        type: string
+      paymentId:
+        type: string
+      processedAt:
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/model.TransactionStatus'
+        enum:
+        - pending
+        - success
+        - failed
+        - timeout
+        example: pending
+      type:
+        allOf:
+        - $ref: '#/definitions/model.TransactionType'
+        enum:
+        - payment
+        - refund
+        - partial_refund
+        example: payment
+      updatedAt:
+        type: string
+    required:
+    - amount
+    - currency
+    - paymentId
+    - status
+    - type
+    type: object
+  model.TransactionStatus:
+    enum:
+    - pending
+    - success
+    - failed
+    - timeout
+    type: string
+    x-enum-varnames:
+    - TransactionStatusPending
+    - TransactionStatusSuccess
+    - TransactionStatusFailed
+    - TransactionStatusTimeout
+  model.TransactionType:
+    enum:
+    - payment
+    - refund
+    - partial_refund
+    type: string
+    x-enum-varnames:
+    - TransactionTypePayment
+    - TransactionTypeRefund
+    - TransactionTypePartialRefund
+  model.UpdatePaymentRequest:
+    properties:
+      description:
+        example: Hotel booking payment
+        type: string
+      paymentMethod:
+        example: credit_card
+        type: string
+      status:
+        allOf:
+        - $ref: '#/definitions/model.PaymentStatus'
+        example: paid
+    type: object
+  model.UpdatePromotionRequest:
+    properties:
+      code:
+        example: SAVE20
+        type: string
+      description:
+        example: Save 20% on your booking
+        type: string
+      discount:
+        example: 20.5
+        type: number
+      endDate:
+        type: string
+      isActive:
+        example: true
+        type: boolean
+      startDate:
+        type: string
+    type: object
+  model.UpdateTransactionRequest:
+    properties:
+      externalId:
+        example: stripe_pi_1234
+        type: string
+      failureReason:
+        type: string
+      gatewayResponse:
+        additionalProperties: true
+        type: object
+      status:
+        allOf:
+        - $ref: '#/definitions/model.TransactionStatus'
+        example: success
+    type: object
+  pagination.PaginatedResponse:
+    properties:
+      items: {}
+      pagination:
+        $ref: '#/definitions/pagination.PaginationInfo'
+    type: object
+  pagination.PaginationInfo:
+    properties:
+      hasNext:
+        example: true
+        type: boolean
+      hasPrevious:
+        example: false
+        type: boolean
+      pageNumber:
+        example: 1
+        type: integer
+      pageSize:
+        example: 10
+        type: integer
+      total:
+        example: 100
+        type: integer
+      totalPages:
+        example: 10
+        type: integer
+    type: object
+  response.APIResponse:
+    properties:
+      data: {}
+      isSuccess:
+        example: true
+        type: boolean
+      message:
+        example: Success
+        type: string
+      statusCode:
+        example: 200
+        type: integer
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a payment service API with promotion management
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Payment Service API
+  version: "1.0"
+paths:
+  /payments:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of payments with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: pageNumber
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: '"created_at"'
+        description: Sort by field
+        in: query
+        name: sortBy
+        type: string
+      - default: '"desc"'
+        description: Sort direction (asc/desc)
+        in: query
+        name: sortDirection
+        type: string
+      - description: Filter by payment status
+        enum:
+        - pending
+        - paid
+        - failed
+        - cancelled
+        - refunded
+        in: query
+        name: status
+        type: string
+      - description: Filter by customer ID
+        in: query
+        name: customerId
+        type: string
+      - description: Filter by payment method
+        in: query
+        name: paymentMethod
+        type: string
+      - description: Minimum payment amount
+        in: query
+        name: minAmount
+        type: number
+      - description: Maximum payment amount
+        in: query
+        name: maxAmount
+        type: number
+      - description: Filter by currency
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/pagination.PaginatedResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get all payments with pagination
+      tags:
+      - payments
+    post:
+      consumes:
+      - application/json
+      description: Create a new payment with the provided details
+      parameters:
+      - description: Payment details
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreatePaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Payment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Create a new payment
+      tags:
+      - payments
+  /payments/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a payment by its ID
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Delete a payment
+      tags:
+      - payments
+    get:
+      consumes:
+      - application/json
+      description: Get a single payment by its ID
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Payment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get payment by ID
+      tags:
+      - payments
+    patch:
+      consumes:
+      - application/json
+      description: Update a payment with the provided details
+      parameters:
+      - description: Payment ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated payment details
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdatePaymentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Payment'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Update a payment
+      tags:
+      - payments
+  /payments/customer/{customerId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all payments for a specific customer
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customerId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Payment'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get payments by customer ID
+      tags:
+      - payments
+  /promotions:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of promotions with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: pageNumber
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: '"created_at"'
+        description: Sort by field
+        in: query
+        name: sortBy
+        type: string
+      - default: '"desc"'
+        description: Sort direction (asc/desc)
+        in: query
+        name: sortDirection
+        type: string
+      - description: Filter by promotion code
+        in: query
+        name: code
+        type: string
+      - description: Filter by active status
+        in: query
+        name: isActive
+        type: boolean
+      - description: Minimum discount percentage
+        in: query
+        name: minDiscount
+        type: number
+      - description: Maximum discount percentage
+        in: query
+        name: maxDiscount
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/pagination.PaginatedResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get all promotions with pagination
+      tags:
+      - promotions
+    post:
+      consumes:
+      - application/json
+      description: Create a new promotion with the provided data
+      parameters:
+      - description: Promotion data
+        in: body
+        name: promotion
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreatePromotionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Promotion'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Create a new promotion
+      tags:
+      - promotions
+  /promotions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an existing promotion by its ID
+      parameters:
+      - description: Promotion ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Delete a promotion
+      tags:
+      - promotions
+    get:
+      consumes:
+      - application/json
+      description: Get a single promotion by its ID
+      parameters:
+      - description: Promotion ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Promotion'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get promotion by ID
+      tags:
+      - promotions
+    patch:
+      consumes:
+      - application/json
+      description: Update an existing promotion with the provided data
+      parameters:
+      - description: Promotion ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Promotion update data
+        in: body
+        name: promotion
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdatePromotionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Promotion'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Update a promotion
+      tags:
+      - promotions
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get a paginated list of transactions with optional filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: pageNumber
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: pageSize
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - default: '"created_at"'
+        description: Sort by field
+        in: query
+        name: sortBy
+        type: string
+      - default: '"desc"'
+        description: Sort direction (asc/desc)
+        in: query
+        name: sortDirection
+        type: string
+      - description: Filter by payment ID
+        in: query
+        name: paymentId
+        type: string
+      - description: Filter by transaction status
+        enum:
+        - pending
+        - success
+        - failed
+        - timeout
+        in: query
+        name: status
+        type: string
+      - description: Filter by transaction type
+        enum:
+        - payment
+        - refund
+        - partial_refund
+        in: query
+        name: type
+        type: string
+      - description: Filter by payment gateway
+        in: query
+        name: paymentGateway
+        type: string
+      - description: Minimum transaction amount
+        in: query
+        name: minAmount
+        type: number
+      - description: Maximum transaction amount
+        in: query
+        name: maxAmount
+        type: number
+      - description: Filter by currency
+        in: query
+        name: currency
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/pagination.PaginatedResponse'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get all transactions with pagination
+      tags:
+      - transactions
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction with the provided details
+      parameters:
+      - description: Transaction details
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Transaction'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Create a new transaction
+      tags:
+      - transactions
+  /transactions/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Delete a transaction
+      tags:
+      - transactions
+    get:
+      consumes:
+      - application/json
+      description: Get a single transaction by its ID
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Transaction'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get transaction by ID
+      tags:
+      - transactions
+    patch:
+      consumes:
+      - application/json
+      description: Update a transaction with the provided details
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated transaction details
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.Transaction'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Update a transaction
+      tags:
+      - transactions
+  /transactions/payment/{paymentId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all transactions for a specific payment
+      parameters:
+      - description: Payment ID
+        in: path
+        name: paymentId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/model.Transaction'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.APIResponse'
+      summary: Get transactions by payment ID
+      tags:
+      - transactions
+schemes:
+- http
+- https
+swagger: "2.0"

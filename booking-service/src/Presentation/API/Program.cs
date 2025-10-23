@@ -28,7 +28,7 @@ builder.Services.AddSwaggerGen();
 //     ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
 
 // Add gRPC
-builder.Services.AddGrpc();
+//builder.Services.AddGrpc();
 
 // Add custom services
 // builder.Services.AddScoped<IBookingService, BookingService.Services.BookingService>();
