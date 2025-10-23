@@ -13,7 +13,7 @@ payment-service/tmp/
 payment-service/go.sum
 payment-service/go.mod
 payment-service/.env
-payment-service/src/
+payment-service/docs/
 
 # .NET
 booking-service/bin/
