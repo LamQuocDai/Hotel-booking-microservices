@@ -13,7 +13,6 @@ public class Review
     public Room Room { get; set; }
     [Required]
     public Guid AccountId { get; set; }
-    [MaxLength(500)]
     public string Comment { get; set; }
     [Range(1, 5)]
     public int Rating { get; set; }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 // using BookingService.Services;
 using Serilog;
 using Infrashtructure;
+using Infrashtructure.Data;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,14 +17,14 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
-// Add Infrastructure and Application services
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
-
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// Add Infrastructure and Application services
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 // Add Entity Framework
 // builder.Services.AddDbContext<BookingDbContext>(options =>
@@ -55,7 +56,30 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
+// Ensure database is created and migrated
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<BookingDbContext>();
+    
+    context.Database.Migrate(); // Automatically applies pending migrations
+    
+    Log.Information("Database migration completed successfully");
+}
+
+Log.Information("Booking API starting up...");
+
 // Map gRPC services
 //app.MapGrpcService<BookingGrpcService>();
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Booking API failed to start");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
