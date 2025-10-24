@@ -22,5 +22,5 @@ public class Booking
     public BookingStatus Status { get; set; }
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime DeletedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

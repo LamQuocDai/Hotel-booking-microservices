@@ -24,5 +24,5 @@ public class Image
     public Room Room { get; set; } = default!;
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime DeletedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

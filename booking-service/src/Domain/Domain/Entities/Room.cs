@@ -16,7 +16,7 @@ public class Room
     public Guid Location { get; set; }
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime DeletedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
     [ForeignKey(nameof(TypeRoomId))]
     public TypeRoom TypeRoom { get; set; } = default!;
     [ForeignKey(nameof(Location))]

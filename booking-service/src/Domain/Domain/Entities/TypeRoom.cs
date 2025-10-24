@@ -12,5 +12,5 @@ public class TypeRoom
     public ICollection<Room> Rooms { get; set; } = new HashSet<Room>();
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime DeletedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

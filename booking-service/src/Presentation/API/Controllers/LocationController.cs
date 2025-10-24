@@ -17,7 +17,7 @@ public class LocationController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<ApiResponseDto<List<LocationDto>>>> GetLocations([FromQuery] LocationPaginationRequestDto request)
     {
-        var response = await _locationService.GetAllLocationsAsync(request);
+        var response = await _locationService.GetLocationsAsync(request);
         return StatusCode(response.StatusCode, response);
     }
     

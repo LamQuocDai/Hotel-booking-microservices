@@ -20,17 +20,17 @@ public class LocationService : ILocationService
         _mapper = mapper;
     }
     
-    public async Task<ApiResponseDto<PagedResponseDto<LocationDto>>>  GetAllLocationsAsync(LocationPaginationRequestDto request) 
+    public async Task<ApiResponseDto<PagedResponseDto<LocationDto>>>  GetLocationsAsync(LocationPaginationRequestDto request) 
     {
         try
         {
-            var query = _context.Locations.AsQueryable();
+            var query = _context.Locations.Where(l => l.DeletedAt == null).AsQueryable();
             
             // Check search
             if (!string.IsNullOrEmpty(request.Search))
             {
                 var searchItem = request.Search.ToLower();
-                query = query.Where(l => l.Name.Contains(request.Search) || l.Address.Contains(request.Search));
+                query = query.Where(l => l.Name.Contains(searchItem) || l.Address.Contains(searchItem));
             }
             // sort by name
             query = (request.SortBy ?? "CreatedAt").ToLower() switch
@@ -85,7 +85,10 @@ public class LocationService : ILocationService
     {
         try
         {
-            var location = await _context.Locations.FindAsync(id);
+            // Find location by id and deletedAt is null
+            var location = await _context.Locations
+                .FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
+            
             if (location == null)
             {
                 return new ApiResponseDto<LocationDto>
