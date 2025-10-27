@@ -30,7 +30,7 @@ public class LocationService : ILocationService
             if (!string.IsNullOrEmpty(request.Search))
             {
                 var searchItem = request.Search.ToLower();
-                query = query.Where(l => l.Name.Contains(searchItem) || l.Address.Contains(searchItem));
+                query = query.Where(l => l.Name.ToLower().Contains(searchItem) || l.Address.ToLower().Contains(searchItem));
             }
             // sort by name
             query = (request.SortBy ?? "CreatedAt").ToLower() switch
@@ -196,7 +196,7 @@ public class LocationService : ILocationService
         }
         try
         {
-            var location = await _context.Locations.FindAsync(id);
+            var location = await _context.Locations.FirstOrDefaultAsync(tr => tr.Id == id && tr.DeletedAt == null);
             if (location == null)
             {
                 return new ApiResponseDto<LocationDto>

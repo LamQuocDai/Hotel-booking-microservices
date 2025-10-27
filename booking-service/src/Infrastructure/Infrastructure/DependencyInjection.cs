@@ -22,6 +22,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ILocationService, LocationService>();
+        services.AddScoped<ITypeRoomService, TypeRoomService>();
 
         return services;
     }
