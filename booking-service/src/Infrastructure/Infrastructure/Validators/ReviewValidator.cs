@@ -5,16 +5,39 @@ namespace Infrashtructure.Validators
 {
     public static class ReviewValidator
     {
-        public static ReviewValidationResult ValidateReview(string reviewText, int rating)
+        public static ReviewValidationResult ValidateRoomId(Guid roomId)
         {
-            if (string.IsNullOrWhiteSpace(reviewText))
+            if (roomId == Guid.Empty)
             {
                 return new ReviewValidationResult
                 {
                     IsValid = false,
-                    ErrorMessage = "Review text cannot be empty."
+                    ErrorMessage = "Room ID cannot be empty."
                 };
             }
+            return new ReviewValidationResult
+            {
+                IsValid = true
+            };
+        }
+
+        public static ReviewValidationResult ValidateAccountId(Guid accountId)
+        {
+            if (accountId == Guid.Empty)
+            {
+                return new ReviewValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = "Account ID cannot be empty."
+                };
+            }
+            return new ReviewValidationResult
+            {
+                IsValid = true
+            };
+        }
+        public static ReviewValidationResult ValidateReview(int rating)
+        {
             if (rating < ReviewValidationConstants.MinRating || rating > ReviewValidationConstants.MaxRating)
             {
                 return new ReviewValidationResult

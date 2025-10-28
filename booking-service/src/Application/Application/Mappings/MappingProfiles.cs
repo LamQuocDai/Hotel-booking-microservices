@@ -20,6 +20,10 @@ public class MappingProfiles : Profile
         CreateMap<Room, RoomDto>().ForMember(dest => dest.TypeRoomName, opt => opt.MapFrom(src => src.TypeRoom.Name))
                                       .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Location.Name));
         CreateMap<CreateRoomDto, Room>().ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
-        
+
+        // Review Mappings
+        CreateMap<Review, ReviewDto>().ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room.Name));
+        CreateMap<CreateReviewDto, Review>().ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+
     }
 }

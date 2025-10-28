@@ -8,7 +8,7 @@ namespace Application.DTOs
         public Guid RoomId { get; set; }
         public string RoomName { get; set; } = string.Empty;
         public Guid AccountId { get; set; }
-        public string Comment { get; set; } = string.Empty;
+        public string? Comment { get; set; }
         public int Rating { get; set; }
         public DateTime CreatedAt { get; set; }
     }
