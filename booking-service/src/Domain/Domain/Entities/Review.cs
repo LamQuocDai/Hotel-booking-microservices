@@ -10,10 +10,10 @@ public class Review
     [Required]
     public Guid RoomId { get; set; }
     [ForeignKey(nameof(RoomId))]
-    public Room Room { get; set; }
+    public Room Room { get; set; } = default!;
     [Required]
     public Guid AccountId { get; set; }
-    public string Comment { get; set; }
+    public string Comment { get; set; } = string.Empty;
     [Range(1, 5)]
     public int Rating { get; set; }
     [Required]

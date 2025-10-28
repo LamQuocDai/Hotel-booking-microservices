@@ -70,7 +70,7 @@ public class TypeRoomService : ITypeRoomService
             {
                 IsSuccess = false,
                 Data = null,
-                Message = "An error occurred while processing your request.",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError,
             };
         }
@@ -106,7 +106,7 @@ public class TypeRoomService : ITypeRoomService
             {
                 IsSuccess = false,
                 Data = null,
-                Message = "An error occurred while processing your request.",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError,
             };
         }
@@ -147,7 +147,7 @@ public class TypeRoomService : ITypeRoomService
                 IsSuccess = true,
                 Data = _mapper.Map<TypeRoomDto>(typeRoom),
                 Message = "Type room created successfully.",
-                StatusCode = ApplicationStatusCode.Success,
+                StatusCode = ApplicationStatusCode.Created,
             };
         }
         catch (Exception ex)
@@ -156,7 +156,7 @@ public class TypeRoomService : ITypeRoomService
             {
                 IsSuccess = false,
                 Data = null,
-                Message = "An error occurred while processing your request."+ ex.Message,
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError,
             };
         }
@@ -218,7 +218,7 @@ public class TypeRoomService : ITypeRoomService
             {
                 IsSuccess = false,
                 Data = null,
-                Message = "An error occurred while processing your request.",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError,
             };
         }
@@ -256,7 +256,7 @@ public class TypeRoomService : ITypeRoomService
             {
                 IsSuccess = false,
                 Data = false,
-                Message = "An error occurred while processing your request.",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError,
             };
         }

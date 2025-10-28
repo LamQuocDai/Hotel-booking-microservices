@@ -17,7 +17,8 @@ public class MappingProfiles : Profile
         CreateMap<CreateTypeRoomDto, TypeRoom>().ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
         
         // Room Mappings
-        CreateMap<Room, RoomDto>();
+        CreateMap<Room, RoomDto>().ForMember(dest => dest.TypeRoomName, opt => opt.MapFrom(src => src.TypeRoom.Name))
+                                      .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Location.Name));
         CreateMap<CreateRoomDto, Room>().ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
         
     }

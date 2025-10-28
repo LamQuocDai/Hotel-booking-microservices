@@ -9,7 +9,7 @@ public class Room
     public Guid Id { get; set; }
     [Required]
     [MaxLength(100), MinLength(3)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     [Required]
     public Guid TypeRoomId { get; set; }
     [Required]
@@ -21,7 +21,7 @@ public class Room
     public TypeRoom TypeRoom { get; set; } = default!;
     [ForeignKey(nameof(LocationId))]
     public Location Location { get; set; } = default!;
-    public ICollection<Image> Images { get; set; } = new List<Image>();
-    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
-    public ICollection<Review> Reviews { get; set; } = new List<Review>();
+    public ICollection<Image> Images { get; set; } = new HashSet<Image>();
+    public ICollection<Booking> Bookings { get; set; } = new HashSet<Booking>();
+    public ICollection<Review> Reviews { get; set; } = new HashSet<Review>();
 }

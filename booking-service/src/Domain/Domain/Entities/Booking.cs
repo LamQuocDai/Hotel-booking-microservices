@@ -11,7 +11,7 @@ public class Booking
     [Required]
     public Guid RoomId { get; set; }
     [ForeignKey(nameof(RoomId))]
-    public Room Room { get; set; }
+    public Room Room { get; set; } = default!;
     [Required]
     public DateTime CheckInTime { get; set; }
     [Required]

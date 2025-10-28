@@ -9,15 +9,15 @@ public class Image
     [Key]
     public Guid Id { get; set; }
     [Required]
-    public string OriginFilename { get; set; }
+    public string OriginFilename { get; set; } = string.Empty;
     [Required]
-    public string Filename { get; set; }
+    public string Filename { get; set; } = string.Empty;
     [Required]
     public int Filesize { get; set; }
     [Required]
-    public string FileType { get; set; }
+    public string FileType { get; set; } = string.Empty;
     [Required]
-    public string FullPath { get; set; }
+    public string FullPath { get; set; } = string.Empty;
     [Required]
     public Guid RoomId { get; set; }
     [ForeignKey(nameof(RoomId))]

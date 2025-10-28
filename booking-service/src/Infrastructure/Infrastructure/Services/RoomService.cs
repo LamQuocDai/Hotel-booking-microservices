@@ -77,7 +77,7 @@ public class RoomService : IRoomService
             return new ApiResponseDto<PagedResponseDto<RoomDto>>
             {
                 IsSuccess = false,
-                Message = $"An error occurred while retrieving rooms: {ex.Message}",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError
             };
         }
@@ -111,7 +111,7 @@ public class RoomService : IRoomService
             return new ApiResponseDto<RoomDto>
             {
                 IsSuccess = false,
-                Message = $"An error occurred while retrieving the room: {ex.Message}",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError
             };
         }
@@ -167,7 +167,7 @@ public class RoomService : IRoomService
             return new ApiResponseDto<RoomDto>
             {
                 IsSuccess = false,
-                Message = $"An error occurred while creating the room: {ex.Message}",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError
             };
         }
@@ -235,7 +235,7 @@ public class RoomService : IRoomService
             return new ApiResponseDto<RoomDto>
             {
                 IsSuccess = false,
-                Message = $"An error occurred while updating the room: {ex.Message}",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError
             };
         }
@@ -271,7 +271,7 @@ public class RoomService : IRoomService
             return new ApiResponseDto<bool>
             {
                 IsSuccess = false,
-                Message = $"An error occurred while deleting the room: {ex.Message}",
+                Message = $"An error occurred: {ex.Message}",
                 StatusCode = ApplicationStatusCode.InternalServerError
             };
         }

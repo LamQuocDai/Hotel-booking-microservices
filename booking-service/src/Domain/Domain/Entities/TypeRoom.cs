@@ -6,7 +6,7 @@ public class TypeRoom
     public Guid Id { get; set; }
     [Required]
     [MaxLength(50), MinLength(3)]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     [Required]
     public double PricePerHour { get; set; }
     public ICollection<Room> Rooms { get; set; } = new HashSet<Room>();
