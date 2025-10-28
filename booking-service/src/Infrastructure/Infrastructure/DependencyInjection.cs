@@ -23,6 +23,7 @@ public static class DependencyInjection
 
         services.AddScoped<ILocationService, LocationService>();
         services.AddScoped<ITypeRoomService, TypeRoomService>();
+        services.AddScoped<IRoomService, RoomService>();
 
         return services;
     }

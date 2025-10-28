@@ -13,14 +13,14 @@ public class Room
     [Required]
     public Guid TypeRoomId { get; set; }
     [Required]
-    public Guid Location { get; set; }
+    public Guid LocationId { get; set; }
     [Required]
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? DeletedAt { get; set; }
     [ForeignKey(nameof(TypeRoomId))]
     public TypeRoom TypeRoom { get; set; } = default!;
-    [ForeignKey(nameof(Location))]
-    public Location LocationRoom { get; set; } = default!;
+    [ForeignKey(nameof(LocationId))]
+    public Location Location { get; set; } = default!;
     public ICollection<Image> Images { get; set; } = new List<Image>();
     public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();

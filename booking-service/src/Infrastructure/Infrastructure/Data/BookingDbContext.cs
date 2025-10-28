@@ -55,10 +55,10 @@ public class BookingDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Name).IsUnique().HasDatabaseName("IX_Room_Name");
             entity.HasIndex(e => e.TypeRoomId).HasDatabaseName("IX_Room_TypeRoomId");
-            entity.HasIndex(e => e.Location).HasDatabaseName("IX_Room_Location");
+            entity.HasIndex(e => e.LocationId).HasDatabaseName("IX_Room_Location");
             entity.Property(e => e.Name).IsRequired();
             entity.Property(e => e.TypeRoomId).IsRequired();
-            entity.Property(e => e.Location).IsRequired();
+            entity.Property(e => e.LocationId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired().HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.DeletedAt).HasDefaultValue(null);
         });
