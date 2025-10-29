@@ -66,7 +66,7 @@ public class BookingDbContext : DbContext
         modelBuilder.Entity<Image>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.OriginFilename).IsRequired();
+            entity.Property(e => e.OriginalFilename).IsRequired();
             entity.Property(e => e.Filename).IsRequired();
             entity.Property(e => e.Filesize).IsRequired();
             entity.Property(e => e.FileType).IsRequired();

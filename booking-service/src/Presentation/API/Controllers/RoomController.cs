@@ -13,6 +13,7 @@ public class RoomController : ControllerBase
     {
         _roomService = roomService;
     }
+    [HttpGet]
     public async Task<ActionResult<ApiResponseDto<PagedResponseDto<RoomDto>>>> GetRoomAsync([FromQuery] RoomPaginationRequestDto paginationRequestDto)
     {
         var response = await _roomService.GetRoomsAsync(paginationRequestDto);

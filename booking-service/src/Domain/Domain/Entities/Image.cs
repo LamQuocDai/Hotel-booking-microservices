@@ -9,7 +9,7 @@ public class Image
     [Key]
     public Guid Id { get; set; }
     [Required]
-    public string OriginFilename { get; set; } = string.Empty;
+    public string OriginalFilename { get; set; } = string.Empty;
     [Required]
     public string Filename { get; set; } = string.Empty;
     [Required]
