@@ -25,5 +25,9 @@ public class MappingProfiles : Profile
         CreateMap<Review, ReviewDto>().ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room.Name));
         CreateMap<CreateReviewDto, Review>().ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
 
+        // Booking Mappings
+        CreateMap<Booking, BookingDto>().ForMember(dest => dest.RoomName, opt => opt.MapFrom(src => src.Room.Name));
+        CreateMap<CreateBookingDto, Booking>().ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+
     }
 }
