@@ -121,7 +121,12 @@ namespace Infrashtructure.Services
                 var deleted = await _fileStorageService.DeleteFileAsync(fileEntity.Filename);
                 if (!deleted)
                 {
-                    _logger.LogWarning("Failed to delete file from S3 storage: {FileName}", fileEntity.Filename);
+                    return new ApiResponseDto<bool>
+                    {
+                        IsSuccess = false,
+                        Message = "Failed to delete file from S3 storage",
+                        StatusCode = ApplicationStatusCode.InternalServerError
+                    };
                 }
 
                 // Delete from database
@@ -147,7 +152,7 @@ namespace Infrashtructure.Services
             }
         }
 
-        public async Task<ApiResponseDto<ImageDto>> GetUploadFileByIdAsync(Guid id)
+        public async Task<ApiResponseDto<ImageDto>> GetImageByIdAsync(Guid id)
         {
             try
             {
