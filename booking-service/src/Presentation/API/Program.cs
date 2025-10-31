@@ -1,11 +1,10 @@
 using Application;
 using Microsoft.EntityFrameworkCore;
-// using BookingService.Data;
-// using BookingService.Services;
 using Serilog;
 using Infrashtructure;
 using Infrashtructure.Data;
 using StackExchange.Redis;
+using API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,24 +25,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
-// Add Entity Framework
-// builder.Services.AddDbContext<BookingDbContext>(options =>
-//     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// // Add Redis
-// builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
-//     ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")));
-
-// Add gRPC
-//builder.Services.AddGrpc();
-
-// Add custom services
-// builder.Services.AddScoped<IBookingService, BookingService.Services.BookingService>();
-// builder.Services.AddScoped<IRedisLockService, RedisLockService>();
 
 var app = builder.Build();
-
-app.MapGet("/health", () => "Booking service OK");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -51,6 +34,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// Use custom middlewares
+app.UseGlobalExceptionHandling();
+app.UseRequestLogging();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
