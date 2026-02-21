@@ -40,15 +40,13 @@ public class SecurityConfig {
                 .requestMatchers("/health").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/auth/login", "/auth/register").permitAll()
+                .requestMatchers("/auth/verify-email", "/auth/resend-verification").permitAll()
+                .requestMatchers("/auth/forgot-password", "/auth/reset-password").permitAll()
 
                 // Swagger endpoints - cho phép truy cập để test API
-                .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/api-docs/**").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
 
                 // H2 console cho test
-                .requestMatchers("/h2-console/**").permitAll()
 
                 // TEMPORARILY: Allow all authenticated users to access all endpoints for testing
                 // TODO: Restore role-based authorization after fixing JWT issues

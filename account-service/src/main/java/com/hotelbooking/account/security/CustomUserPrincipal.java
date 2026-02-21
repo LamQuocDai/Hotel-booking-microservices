@@ -50,7 +50,7 @@ public class CustomUserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return account.getDeletedAt() == null;
+        return account.getDeletedAt() == null && Boolean.TRUE.equals(account.getIsActive());
     }
 
     // Microservice-friendly utility methods

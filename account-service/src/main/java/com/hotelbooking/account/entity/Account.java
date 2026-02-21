@@ -38,6 +38,21 @@ public class Account {
     private RoleType role; // Sử dụng trực tiếp enum thay vì entity Role
 
     @Column(nullable = false)
+    private Boolean isActive = false; // Email verification status
+
+    @Column(length = 255)
+    private String verificationToken; // Token for email verification
+
+    @Column
+    private OffsetDateTime verificationTokenExpiresAt; // Token expiration
+
+    @Column(length = 255)
+    private String passwordResetToken; // Token for password reset
+
+    @Column
+    private OffsetDateTime passwordResetTokenExpiresAt; // Password reset token expiration
+
+    @Column(nullable = false)
     private OffsetDateTime createdAt;
 
     private OffsetDateTime deletedAt;

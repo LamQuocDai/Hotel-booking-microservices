@@ -17,6 +17,8 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     Optional<Account> findByEmail(String email);
     Optional<Account> findByUsernameAndDeletedAtIsNull(String username);
     Optional<Account> findByEmailAndDeletedAtIsNull(String email);
+    Optional<Account> findByVerificationTokenAndDeletedAtIsNull(String verificationToken);
+    Optional<Account> findByPasswordResetTokenAndDeletedAtIsNull(String passwordResetToken);
 
     // Find all non-deleted accounts with pagination
     Page<Account> findByDeletedAtIsNull(Pageable pageable);
@@ -24,7 +26,7 @@ public interface AccountRepository extends JpaRepository<Account, UUID> {
     // Filter by role
     Page<Account> findByRoleAndDeletedAtIsNull(RoleType role, Pageable pageable);
 
-    Optional<Account> findByUserIdAndDeletedAtIsNull(UUID userId);
+    Optional<Account> findByIdAndDeletedAtIsNull(UUID id);
 
     // Search by keyword in username, email, or phone
     @Query("SELECT a FROM Account a WHERE a.deletedAt IS NULL AND " +

@@ -1,5 +1,6 @@
 package com.hotelbooking.account.security;
 
+import com.hotelbooking.account.service.BlacklistTokenService;
 import com.hotelbooking.account.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final BlacklistTokenService blacklistTokenService;
 
     @Override
     protected void doFilterInternal(
@@ -40,6 +42,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
+        
+        // Check if token is blacklisted
+        if (blacklistTokenService.isTokenBlacklisted(jwt)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\": \"Token has been revoked\", \"success\": false, \"statusCode\": 401}");
+            response.setContentType("application/json");
+            return;
+        }
+        
         username = jwtService.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
