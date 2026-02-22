@@ -40,7 +40,7 @@ func main() {
 	defer db.Close()
 
 	// Initialize container with dependency injection
-	container := container.NewContainer(db)
+	container := container.NewContainer(db, cfg)
 
 	// Setup router
 	r := router.NewRouter()
@@ -48,6 +48,7 @@ func main() {
 		PromotionHandler:   container.PromotionHandler,
 		PaymentHandler:     container.PaymentHandler,
 		TransactionHandler: container.TransactionHandler,
+		MoMoHandler:        container.MoMoHandler,
 	}
 	r.SetupRoutes(handlers)
 

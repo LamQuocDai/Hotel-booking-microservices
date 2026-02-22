@@ -17,6 +17,7 @@ type PaymentStore interface {
 	GetPayments() ([]model.Payment, error)
 	GetPaymentsPaginated(query *pagination.PaginationQuery, filter *model.PaymentFilterQuery) ([]model.Payment, int64, error)
 	GetPaymentByID(id uuid.UUID) (*model.Payment, error)
+	GetPaymentByOrderID(orderID string) (*model.Payment, error)
 	GetPaymentsByCustomerID(customerID uuid.UUID) ([]model.Payment, error)
 	CreatePayment(payment *model.Payment) error
 	UpdatePayment(id uuid.UUID, payment *model.Payment) error
@@ -91,6 +92,18 @@ func (s *mongoStorePayment) GetPaymentByID(id uuid.UUID) (*model.Payment, error)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
+		}
+		return nil, err
+	}
+	return &payment, nil
+}
+
+func (s *mongoStorePayment) GetPaymentByOrderID(orderID string) (*model.Payment, error) {
+	var payment model.Payment
+	err := s.collection.FindOne(context.TODO(), bson.M{"order_id": orderID}).Decode(&payment)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // Return nil without error if payment not found
 		}
 		return nil, err
 	}

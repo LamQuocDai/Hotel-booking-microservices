@@ -16,6 +16,7 @@ type Handlers struct {
 	PromotionHandler   *handler.PromotionHandler
 	PaymentHandler     *handler.PaymentHandler
 	TransactionHandler *handler.TransactionHandler
+	MoMoHandler        *handler.MoMoHandler
 }
 
 func NewRouter() *Router {
@@ -55,6 +56,14 @@ func (r *Router) SetupRoutes(handlers *Handlers) {
 			payments.POST("", handlers.PaymentHandler.CreatePayment)
 			payments.PATCH("/:id", handlers.PaymentHandler.UpdatePayment)
 			payments.DELETE("/:id", handlers.PaymentHandler.DeletePayment)
+
+			// MoMo payment routes
+			payments.POST("/checkout", handlers.MoMoHandler.CreateMoMoPayment)
+			payments.POST("/momo/webhook", handlers.MoMoHandler.HandleMoMoWebhook)
+			payments.GET("/:id/status", handlers.MoMoHandler.GetPaymentStatus)
+			payments.POST("/:id/cancel", handlers.MoMoHandler.CancelPayment)
+			payments.GET("/order/:orderID", handlers.MoMoHandler.GetMoMoPaymentByOrderID)
+			payments.GET("/momo/transactions", handlers.MoMoHandler.ListMoMoTransactions)
 		}
 
 		// Transaction routes

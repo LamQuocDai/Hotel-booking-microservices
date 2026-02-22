@@ -62,3 +62,17 @@ func NotFoundResponse(c *gin.Context, message string) {
 	}
 	ErrorResponse(c, http.StatusNotFound, message)
 }
+
+// Convenience functions with shorter names
+// Success creates a successful response with default 200 status
+func Success(c *gin.Context, data interface{}, message string) {
+	SuccessResponse(c, http.StatusOK, data, message)
+}
+
+// Error creates an error response with specified status and message
+func Error(c *gin.Context, statusCode int, message string, details ...string) {
+	if len(details) > 0 && details[0] != "" {
+		message = message + ": " + details[0]
+	}
+	ErrorResponse(c, statusCode, message)
+}

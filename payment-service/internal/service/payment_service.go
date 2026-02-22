@@ -39,6 +39,10 @@ func (s *PaymentService) GetPaymentByID(id uuid.UUID) (*model.Payment, error) {
 	return s.paymentStore.GetPaymentByID(id)
 }
 
+func (s *PaymentService) GetPaymentByOrderID(orderID string) (*model.Payment, error) {
+	return s.paymentStore.GetPaymentByOrderID(orderID)
+}
+
 func (s *PaymentService) GetPaymentsByCustomerID(customerID uuid.UUID) ([]model.Payment, error) {
 	return s.paymentStore.GetPaymentsByCustomerID(customerID)
 }
