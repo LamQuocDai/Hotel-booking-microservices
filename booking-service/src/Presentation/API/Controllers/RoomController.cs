@@ -9,9 +9,12 @@ namespace API.Controllers;
 public class RoomController : ControllerBase
 {
     private readonly IRoomService _roomService;
-    public RoomController(IRoomService roomService)
+    private readonly IBookingService _bookingService;
+
+    public RoomController(IRoomService roomService, IBookingService bookingService)
     {
         _roomService = roomService;
+        _bookingService = bookingService;
     }
     [HttpGet]
     public async Task<ActionResult<ApiResponseDto<PagedResponseDto<RoomDto>>>> GetRoomAsync([FromQuery] RoomPaginationRequestDto paginationRequestDto)
@@ -46,6 +49,30 @@ public class RoomController : ControllerBase
     public async Task<ActionResult<ApiResponseDto<bool>>> DeleteRoomAsync(Guid id)
     {
         var response = await _roomService.DeleteRoomAsync(id);
+        return StatusCode(response.StatusCode, response);
+    }
+
+    /// <summary>
+    /// Get daily availability for a room within a date range.
+    /// Returns an array of dates with availability status.
+    /// </summary>
+    /// <param name="id">Room ID</param>
+    /// <param name="start">Start date (inclusive) in yyyy-MM-dd format</param>
+    /// <param name="end">End date (exclusive) in yyyy-MM-dd format</param>
+    /// <returns>Array of daily availability</returns>
+    [HttpGet("{id}/availability")]
+    public async Task<ActionResult<ApiResponseDto<List<DailyAvailabilityDto>>>> GetRoomAvailabilityAsync(
+        Guid id,
+        [FromQuery] DateTime start,
+        [FromQuery] DateTime end)
+    {
+        var request = new RoomAvailabilityRequestDto
+        {
+            Start = start,
+            End = end
+        };
+
+        var response = await _bookingService.GetRoomAvailabilityAsync(id, request);
         return StatusCode(response.StatusCode, response);
     }
 }

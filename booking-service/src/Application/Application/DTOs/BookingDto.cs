@@ -37,4 +37,16 @@ namespace Application.DTOs
         public DateTime? CheckOutTime { get; set; }
         public BookingStatus? Status { get; set; }
     }
+
+    public class RoomAvailabilityRequestDto
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+    }
+
+    public class DailyAvailabilityDto
+    {
+        public string Date { get; set; } = string.Empty;
+        public bool Available { get; set; }
+    }
 }

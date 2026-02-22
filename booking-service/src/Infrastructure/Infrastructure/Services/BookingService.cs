@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Infrashtructure.Validators;
 using Domain.Entities;
 using Domain.Enums;
+using Infrashtructure.Helpers;
 
 namespace Infrashtructure.Services
 {
@@ -14,10 +15,19 @@ namespace Infrashtructure.Services
     {
         private readonly BookingDbContext _context;
         private readonly IMapper _mapper;
-        public BookingService(BookingDbContext context, IMapper mapper)
+        private readonly IBookingRepository _bookingRepository;
+        private readonly RedisLockHelper _redisLock;
+
+        public BookingService(
+            BookingDbContext context, 
+            IMapper mapper,
+            IBookingRepository bookingRepository,
+            RedisLockHelper redisLock)
         {
             _context = context;
             _mapper = mapper;
+            _bookingRepository = bookingRepository;
+            _redisLock = redisLock;
         }
 
         public async Task<ApiResponseDto<PagedResponseDto<BookingDto>>> GetBookingsAsync(BookingPaginationRequestDto request)
@@ -120,6 +130,7 @@ namespace Infrashtructure.Services
         {
             try
             {
+                // 1. Validate booking dates
                 var dateValidation = BookingValidator.ValidateBookingDates(createBookingDto.CheckInTime, createBookingDto.CheckOutTime);
                 if (!dateValidation.IsValid)
                 {
@@ -130,7 +141,8 @@ namespace Infrashtructure.Services
                         StatusCode = ApplicationStatusCode.BadRequest
                     };
                 }
-                // check room existence
+
+                // 2. Check room existence
                 if (!await _context.Rooms.AnyAsync(r => r.Id == createBookingDto.RoomId && r.DeletedAt == null))
                 {
                     return new ApiResponseDto<BookingDto>
@@ -140,19 +152,77 @@ namespace Infrashtructure.Services
                         StatusCode = ApplicationStatusCode.BadRequest
                     };
                 }
-                // Set default status
-                var booking = _mapper.Map<Booking>(createBookingDto);
-                booking.Status = BookingStatus.Holding;
-                _context.Bookings.Add(booking);
-                await _context.SaveChangesAsync();
 
-                return new ApiResponseDto<BookingDto>
+                // 3. Acquire Redis distributed lock to prevent race conditions
+                // Lock key format: lock:room:{roomId}
+                var lockKey = $"lock:room:{createBookingDto.RoomId}";
+                var lockValue = Guid.NewGuid().ToString();
+                var lockAcquired = await _redisLock.AcquireLockAsync(lockKey, lockValue, expiryMilliseconds: 10000);
+
+                if (!lockAcquired)
                 {
-                    IsSuccess = true,
-                    Data = _mapper.Map<BookingDto>(booking),
-                    Message = "Booking created successfully.",
-                    StatusCode = ApplicationStatusCode.Created,
-                };
+                    return new ApiResponseDto<BookingDto>
+                    {
+                        IsSuccess = false,
+                        Message = "Unable to process booking at this time. Please try again.",
+                        StatusCode = ApplicationStatusCode.Conflict
+                    };
+                }
+
+                try
+                {
+                    // 4. Start database transaction
+                    await using var transaction = await _context.Database.BeginTransactionAsync();
+
+                    try
+                    {
+                        // 5. Recheck availability inside transaction (double-check pattern)
+                        // This ensures no booking was created between initial check and lock acquisition
+                        var isAvailable = await _bookingRepository.IsRoomAvailableAsync(
+                            createBookingDto.RoomId,
+                            createBookingDto.CheckInTime,
+                            createBookingDto.CheckOutTime);
+
+                        if (!isAvailable)
+                        {
+                            return new ApiResponseDto<BookingDto>
+                            {
+                                IsSuccess = false,
+                                Message = "Room is not available for the selected dates.",
+                                StatusCode = ApplicationStatusCode.Conflict
+                            };
+                        }
+
+                        // 6. Create booking with default status
+                        var booking = _mapper.Map<Booking>(createBookingDto);
+                        booking.Status = BookingStatus.Holding;
+
+                        _context.Bookings.Add(booking);
+                        await _context.SaveChangesAsync();
+
+                        // 7. Commit transaction
+                        await transaction.CommitAsync();
+
+                        return new ApiResponseDto<BookingDto>
+                        {
+                            IsSuccess = true,
+                            Data = _mapper.Map<BookingDto>(booking),
+                            Message = "Booking created successfully.",
+                            StatusCode = ApplicationStatusCode.Created,
+                        };
+                    }
+                    catch
+                    {
+                        // Rollback on any error
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
+                }
+                finally
+                {
+                    // 8. Always release the lock (using Lua script to ensure only we release it)
+                    await _redisLock.ReleaseLockAsync(lockKey, lockValue);
+                }
             }
             catch (Exception ex)
             {
@@ -170,7 +240,7 @@ namespace Infrashtructure.Services
             try
             {
                 var dateValidation = BookingValidator.ValidateBookingDates(updateBookingDto.CheckInTime, updateBookingDto.CheckOutTime);
-                if(dateValidation.IsValid) {
+                if(!dateValidation.IsValid) {
                     return new ApiResponseDto<BookingDto>
                     {
                         IsSuccess = false,
@@ -244,6 +314,81 @@ namespace Infrashtructure.Services
                     Message = $"An error occurred: {ex.Message}",
                     StatusCode = ApplicationStatusCode.InternalServerError,
                     Data = false
+                };
+            }
+        }
+
+        public async Task<ApiResponseDto<List<DailyAvailabilityDto>>> GetRoomAvailabilityAsync(Guid roomId, RoomAvailabilityRequestDto request)
+        {
+            try
+            {
+                // 1. Validate date range
+                if (request.Start >= request.End)
+                {
+                    return new ApiResponseDto<List<DailyAvailabilityDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Start date must be before end date.",
+                        StatusCode = ApplicationStatusCode.BadRequest
+                    };
+                }
+
+                // 2. Check room existence
+                if (!await _context.Rooms.AnyAsync(r => r.Id == roomId && r.DeletedAt == null))
+                {
+                    return new ApiResponseDto<List<DailyAvailabilityDto>>
+                    {
+                        IsSuccess = false,
+                        Message = "Room not found.",
+                        StatusCode = ApplicationStatusCode.NotFound
+                    };
+                }
+
+                // 3. Fetch all overlapping bookings in the date range
+                var overlappingBookings = await _bookingRepository.GetOverlappingBookingsAsync(
+                    roomId,
+                    request.Start,
+                    request.End);
+
+                // 4. Generate daily availability
+                var dailyAvailability = new List<DailyAvailabilityDto>();
+                var currentDate = request.Start.Date;
+                var endDate = request.End.Date;
+
+                while (currentDate < endDate)
+                {
+                    var nextDate = currentDate.AddDays(1);
+
+                    // Check if any booking overlaps with this specific day
+                    // A booking overlaps with a day if:
+                    // booking.CheckInTime < nextDate AND booking.CheckOutTime > currentDate
+                    var isBooked = overlappingBookings.Any(b =>
+                        b.CheckInTime < nextDate && b.CheckOutTime > currentDate);
+
+                    dailyAvailability.Add(new DailyAvailabilityDto
+                    {
+                        Date = currentDate.ToString("yyyy-MM-dd"),
+                        Available = !isBooked
+                    });
+
+                    currentDate = nextDate;
+                }
+
+                return new ApiResponseDto<List<DailyAvailabilityDto>>
+                {
+                    IsSuccess = true,
+                    Data = dailyAvailability,
+                    Message = "Availability retrieved successfully.",
+                    StatusCode = ApplicationStatusCode.Success
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseDto<List<DailyAvailabilityDto>>
+                {
+                    IsSuccess = false,
+                    Message = $"An error occurred: {ex.Message}",
+                    StatusCode = ApplicationStatusCode.InternalServerError
                 };
             }
         }

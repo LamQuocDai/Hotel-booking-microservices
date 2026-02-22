@@ -9,5 +9,6 @@ namespace Application.Interfaces
         Task<ApiResponseDto<BookingDto>> CreateBookingAsync(CreateBookingDto createBookingDto);
         Task<ApiResponseDto<BookingDto>> UpdateBookingAsync(Guid id, UpdateBookingDto updateBookingDto);
         Task<ApiResponseDto<bool>> DeleteBookingAsync(Guid id);
+        Task<ApiResponseDto<List<DailyAvailabilityDto>>> GetRoomAvailabilityAsync(Guid roomId, RoomAvailabilityRequestDto request);
     }
 }

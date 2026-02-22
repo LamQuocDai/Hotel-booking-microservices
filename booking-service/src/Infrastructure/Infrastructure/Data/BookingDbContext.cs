@@ -82,6 +82,12 @@ public class BookingDbContext : DbContext
             entity.HasIndex(e => e.RoomId).HasDatabaseName("IX_Booking_RoomId");
             entity.HasIndex(e => e.AccountId).HasDatabaseName("IX_Booking_AccountId");
             entity.HasIndex(e => e.Status).HasDatabaseName("IX_Booking_Status");
+            
+            // Composite index for efficient availability checking
+            // This index optimizes queries that check for overlapping bookings
+            entity.HasIndex(e => new { e.RoomId, e.CheckInTime, e.CheckOutTime })
+                .HasDatabaseName("IX_Booking_Room_CheckInOut");
+            
             entity.Property(e => e.RoomId).IsRequired();
             entity.Property(e => e.AccountId).IsRequired();
             entity.Property(e => e.CheckInTime).IsRequired();
