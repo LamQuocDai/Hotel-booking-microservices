@@ -24,17 +24,18 @@ public class SeedData implements CommandLineRunner {
     }
 
     private void seedAdminAccount() {
-        if (accountRepository.findByEmailAndDeletedAtIsNull("admin@admin.com").isEmpty()) {
+        if (accountRepository.findByEmailAndDeletedAtIsNull("admin@gmail.com").isEmpty()) {
             Account admin = new Account();
-            admin.setEmail("admin@admin.com");
+            admin.setEmail("admin@gmail.com");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setUsername("Admin");
             admin.setPhone("0000000000");
+            admin.setIsActive(true);
             admin.setCreatedAt(OffsetDateTime.now());
             admin.setRole(RoleType.ADMIN); // Sử dụng trực tiếp enum
 
             accountRepository.save(admin);
-            System.out.println("Created admin account: admin@admin.com / admin123");
+            System.out.println("Created admin account: admin@gmail.com / admin123");
         }
     }
 }

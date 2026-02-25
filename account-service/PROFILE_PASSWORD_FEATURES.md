@@ -465,21 +465,30 @@ public class ResetPasswordRequest {
 
 ### Email Configuration
 
-Ensure proper SMTP configuration in `application.yml`:
+Ensure proper SendGrid configuration in `application.yml` and environment variables:
 
 ```yaml
-spring:
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    from: ${MAIL_FROM}
+# SendGrid Configuration
+sendgrid:
+  api-key: ${SENDGRID_API_KEY:your-sendgrid-api-key-here}
+  from-email: ${SENDGRID_FROM_EMAIL:noreply@hotelbooking.com}
+  from-name: ${SENDGRID_FROM_NAME:Hotel Booking}
 
 app:
   frontend:
     url: ${FRONTEND_URL}
 ```
+
+**Environment Variables:**
+
+```bash
+export SENDGRID_API_KEY="SG.your-api-key-here"
+export SENDGRID_FROM_EMAIL="noreply@hotelbooking.com"
+export SENDGRID_FROM_NAME="Hotel Booking"
+export FRONTEND_URL="https://your-domain.com"
+```
+
+See [SENDGRID_SETUP.md](SENDGRID_SETUP.md) for complete SendGrid setup guide.
 
 ### Security Best Practices Implemented
 
