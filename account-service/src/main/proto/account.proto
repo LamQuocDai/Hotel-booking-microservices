@@ -3,54 +3,59 @@ syntax = "proto3";
 package com.hotelbooking.account;
 
 option java_multiple_files = true;
-option java_package = "com.hotelbooking.account.proto";
+option java_package = "com.hotelbooking.account.grpc";
 
-service AccountService {
+// ============================================================
+// AUTHENTICATION SERVICE
+// ============================================================
+service AuthService {
+  // Authentication endpoints
   rpc Login(LoginRequest) returns (LoginResponse);
   rpc Register(RegisterRequest) returns (RegisterResponse);
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
+  rpc Logout(LogoutRequest) returns (LogoutResponse);
+  
+  // Email verification
+  rpc VerifyEmail(VerifyEmailRequest) returns (VerifyEmailResponse);
+  rpc ResendVerificationEmail(ResendVerificationRequest) returns (ResendVerificationResponse);
+  
+  // Profile management
   rpc GetProfile(GetProfileRequest) returns (GetProfileResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  
+  // Password management
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse);
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
 }
 
-message LoginRequest {
-  string email = 1;
-  string password = 2;
+// ============================================================
+// ADMIN USER MANAGEMENT SERVICE
+// ============================================================
+service AdminService {
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc GetUsersByRole(GetUsersByRoleRequest) returns (ListUsersResponse);
+  rpc GetAvailableRoles(GetAvailableRolesRequest) returns (GetAvailableRolesResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
 }
 
-message LoginResponse {
-  string token = 1;
-  string refresh_token = 2;
-  User user = 3;
+// ============================================================
+// HEALTH CHECK SERVICE
+// ============================================================
+service HealthService {
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
 }
 
-message RegisterRequest {
-  string username = 1;
-  string email = 2;
-  string password = 3;
-  string phone = 4;
-}
+// ============================================================
+// COMMON MESSAGES
+// ============================================================
 
-message RegisterResponse {
-  string token = 1;
-  string refresh_token = 2;
-  User user = 3;
-}
-
-message RefreshTokenRequest {
-  string refresh_token = 1;
-}
-
-message RefreshTokenResponse {
-  string token = 1;
-  string refresh_token = 2;
-}
-
-message GetProfileRequest {
-  string user_id = 1;
-}
-
-message GetProfileResponse {
-  User user = 1;
+message ApiResponse {
+  bool success = 1;
+  string message = 2;
+  int32 status_code = 3;
 }
 
 message User {
@@ -58,6 +63,223 @@ message User {
   string username = 2;
   string email = 3;
   string phone = 4;
+  string image_url = 5;
+  string role = 6;
+  bool is_active = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+// ============================================================
+// AUTH SERVICE MESSAGES
+// ============================================================
+
+// Login
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  ApiResponse api_response = 1;
+  string token = 2;
+  string refresh_token = 3;
+  User user = 4;
+}
+
+// Register
+message RegisterRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string password_confirmation = 4;
+  string phone = 5;
+}
+
+message RegisterResponse {
+  ApiResponse api_response = 1;
+  User user = 2;
+}
+
+// Refresh Token
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  ApiResponse api_response = 1;
+  string token = 2;
+  string refresh_token = 3;
+}
+
+// Logout
+message LogoutRequest {
+  string token = 1;
+}
+
+message LogoutResponse {
+  ApiResponse api_response = 1;
+}
+
+// Verify Email
+message VerifyEmailRequest {
+  string token = 1;
+}
+
+message VerifyEmailResponse {
+  ApiResponse api_response = 1;
+  User user = 2;
+}
+
+// Resend Verification Email
+message ResendVerificationRequest {
+  string email = 1;
+}
+
+message ResendVerificationResponse {
+  ApiResponse api_response = 1;
+}
+
+// Get Profile
+message GetProfileRequest {
+  string user_id = 1;
+}
+
+message GetProfileResponse {
+  ApiResponse api_response = 1;
+  User user = 2;
+}
+
+// Update Profile
+message UpdateProfileRequest {
+  string user_id = 1;
+  string phone = 2;
+  string image_url = 3;
+}
+
+message UpdateProfileResponse {
+  ApiResponse api_response = 1;
+  User user = 2;
+}
+
+// Change Password
+message ChangePasswordRequest {
+  string user_id = 1;
+  string old_password = 2;
+  string new_password = 3;
+  string password_confirmation = 4;
+}
+
+message ChangePasswordResponse {
+  ApiResponse api_response = 1;
+}
+
+// Forgot Password
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ForgotPasswordResponse {
+  ApiResponse api_response = 1;
+}
+
+// Reset Password
+message ResetPasswordRequest {
+  string token = 1;
+  string new_password = 2;
+  string password_confirmation = 3;
+}
+
+message ResetPasswordResponse {
+  ApiResponse api_response = 1;
+}
+
+// ============================================================
+// ADMIN SERVICE MESSAGES
+// ============================================================
+
+// List Users
+message ListUsersRequest {
+  int32 page_number = 1;
+  int32 page_size = 2;
+  string search = 3;
+  string sort_by = 4;
+  string sort_direction = 5;
+}
+
+message ListUsersResponse {
+  ApiResponse api_response = 1;
+  repeated User users = 2;
+  int32 total_count = 3;
+  int32 page_number = 4;
+  int32 page_size = 5;
+  int32 total_pages = 6;
+}
+
+// Get Users By Role
+message GetUsersByRoleRequest {
+  string role_name = 1;
+  int32 page_number = 2;
+  int32 page_size = 3;
+  string search = 4;
+  string sort_by = 5;
+  string sort_direction = 6;
+}
+
+// Get Available Roles
+message GetAvailableRolesRequest {}
+
+message GetAvailableRolesResponse {
+  ApiResponse api_response = 1;
+  repeated string roles = 2;
+}
+
+// Create User
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string phone = 4;
   string role = 5;
-  string created_at = 6;
+}
+
+message CreateUserResponse {
+  ApiResponse api_response = 1;
+  User user = 2;
+}
+
+// Update User
+message UpdateUserRequest {
+  string user_id = 1;
+  string phone = 2;
+  string image_url = 3;
+}
+
+message UpdateUserResponse {
+  ApiResponse api_response = 1;
+  User user = 2;
+}
+
+// Delete User
+message DeleteUserRequest {
+  string user_id = 1;
+}
+
+message DeleteUserResponse {
+  ApiResponse api_response = 1;
+}
+
+// ============================================================
+// HEALTH SERVICE MESSAGES
+// ============================================================
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+  }
+  ServingStatus status = 1;
 }

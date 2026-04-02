@@ -208,8 +208,7 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid phone number");
         }
 
-        // Update allowed fields only
-        account.setUsername(updateProfileDTO.getUsername());
+        // Update allowed fields only (username is immutable)
         account.setPhone(updateProfileDTO.getPhone());
         account.setImageUrl(updateProfileDTO.getImageUrl());
 

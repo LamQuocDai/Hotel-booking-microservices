@@ -218,7 +218,7 @@ public class AuthController {
         }
     }
 
-    @PutMapping("/profile")
+    @PatchMapping("/profile")
     public ResponseEntity<?> updateCurrentUserProfile(
             @Valid @RequestBody UpdateProfileDTO updateProfileDTO, 
             BindingResult bindingResult,

@@ -110,8 +110,6 @@ public class AdminUserService {
         if (PhoneValidator.isValidVietnamesePhone(accountDTO.getPhone())) {
             throw new IllegalArgumentException("Invalid phone number");
         }
-
-        account.setUsername(accountDTO.getUsername());
         account.setPhone(accountDTO.getPhone());
         account.setImageUrl(accountDTO.getImageUrl());
 
